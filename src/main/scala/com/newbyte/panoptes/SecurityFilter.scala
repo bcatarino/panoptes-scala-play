@@ -1,4 +1,4 @@
-package com.newbyte.doorman
+package com.newbyte.panoptes
 
 import javax.inject.Inject
 

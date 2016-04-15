@@ -1,6 +1,6 @@
-package com.newbyte.doorman
+package com.newbyte.panoptes
 
-import com.newbyte.doorman.model.Subject
+import com.newbyte.panoptes.model.Subject
 import play.api.mvc.{RequestHeader, Result, Results}
 
 trait AuthorizationHandler {

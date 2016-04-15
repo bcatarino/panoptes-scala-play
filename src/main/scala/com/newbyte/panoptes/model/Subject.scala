@@ -1,4 +1,4 @@
-package com.newbyte.doorman.model
+package com.newbyte.panoptes.model
 
 import scala.collection.Set
 
