@@ -1,3 +1,3 @@
 package com.newbyte.panoptes
 
-case class Pattern(method: String, pattern: String)
+case class Pattern(method: Option[String], pattern: String)

@@ -34,6 +34,12 @@ Any feedback, improvements and collaborations would be welcome.
 
 ### Import Dependencies
 
+In your ```build.sbt```, add
+
+```
+libraryDependencies += "com.newbyte" %% "panoptes-scala-play" % "0.9.1-SNAPSHOT"
+```
+
 ### Declare Filter
 
 Create a class that extends HttpFilters and inject an instance of ```com.newbyte.panoptes.SecurityFilter```.
@@ -101,13 +107,15 @@ class MyAuthorizationHandler extends AuthorizationHandler {
 
   override def config = {
     val adminAppRoles = atLeastOne(withRole("Admin"), withRole("Manager"))
-    Set(Pattern(POST, "/devices") -> adminAppRoles,
-        Pattern(GET, "/users") -> adminAppRoles)
+    Set(Pattern(Some(POST), "/products") -> adminAppRoles,
+        Pattern(Some(GET), "/users") -> adminAppRoles),
+        Pattern(None, "/cart") -> adminAppRoles)
   }
 }
 ```
 
 ```com.newbyte.panoptes.Pattern``` specifies the http method and the url relative path to which a rule applies.
+If the method is ```None```, any method with that pattern will match.
 The pattern path is a regular regex expression.
 
 ```atLeastOne``` and ```withRole``` are implementations of the trait ```com.newbyte.panoptes.AuthorizationRule```.
@@ -245,10 +253,10 @@ class MyAuthorizationHandler extends AuthorizationHandler {
 }
 ```
 
-Why would you do that? Dunno, but you can!!!!
+Why would you want to do that? Dunno, but you can!!!
 
 ## What's next?
 
 * Permission based rules.
-* Code samples.
-* Any requests from you guys.
+* More code samples.
+* Opened to hear requests from you.

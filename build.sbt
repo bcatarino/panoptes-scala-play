@@ -1,13 +1,17 @@
 
 organization := "com.newbyte"
 name := "panoptes-scala-play"
-version := "0.9.0-SNAPSHOT"
+version := "0.9.1-SNAPSHOT"
 scalaVersion := "2.11.8"
 
 
 
 
 libraryDependencies ++= Seq("com.typesafe.play" %% "play" % "2.4.3")
+
+libraryDependencies ++= Seq(
+  "org.specs2" % "specs2-core_2.11" % "3.7.3" % "test"
+)
 
 
 

@@ -18,8 +18,8 @@ trait AuthorizationHandler {
   }
 
   def getClosestMatch(request: RequestHeader) = {
-    val exactMatch = rules.find(ruleTuple => ruleTuple._1.method.equals(request.method)
-      && ruleTuple._1.pattern.equals(request.path))
+    val exactMatch = rules.find(ruleTuple => ruleTuple._1.method.getOrElse(request.method).equals(request.method)
+      && noEndSlash(ruleTuple._1.pattern).equals(noEndSlash(request.path)))
 
     exactMatch match {
       case Some(rule) => Some(rule._2)
@@ -29,9 +29,14 @@ trait AuthorizationHandler {
     }
   }
 
+  private def noEndSlash(path: String) = {
+    if (path.endsWith("/")) path.substring(0, path.length - 1) else path
+  }
+
   private def findCloseMatches(request: RequestHeader) = {
-    rules.filter(ruleTuple => ruleTuple._1.method.equals(request.method)
-      && request.path.matches(ruleTuple._1.pattern))
+    rules.filter(ruleTuple =>
+      ruleTuple._1.method.getOrElse(request.method).equals(request.method) &&
+        noEndSlash(request.path).matches(noEndSlash(ruleTuple._1.pattern)))
   }
 
   private def findClosestMatch(closeMatches: Set[(Pattern, _ <: AuthorizationRule)]) = {
