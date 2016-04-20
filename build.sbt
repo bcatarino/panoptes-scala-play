@@ -1,7 +1,7 @@
 
 organization := "com.newbyte"
 name := "panoptes-scala-play"
-version := "1.0.1"
+version := "0.9.0-SNAPSHOT"
 scalaVersion := "2.11.8"
 
 
