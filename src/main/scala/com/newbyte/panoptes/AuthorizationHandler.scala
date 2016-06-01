@@ -3,13 +3,17 @@ package com.newbyte.panoptes
 import com.newbyte.panoptes.model.Subject
 import play.api.mvc.{RequestHeader, Result, Results}
 
+import scala.concurrent.Future
+
 trait AuthorizationHandler {
 
   private lazy val rules: Set[(Pattern, _ <: AuthorizationRule)] = config
 
   def authHeaderName = "Authorization"
 
-  def authHeaderNotPresentAction(request: RequestHeader) = Results.Forbidden
+  def authHeaderNotPresentAction(request: RequestHeader, next: (RequestHeader) => Future[Result]) = {
+    Results.Forbidden
+  }
 
   def userNotAllowedStatus: Result = Results.Forbidden
 
