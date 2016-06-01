@@ -37,7 +37,7 @@ Any feedback, improvements and collaborations would be welcome.
 In your ```build.sbt```, add
 
 ```
-libraryDependencies += "com.newbyte" %% "panoptes-scala-play" % "0.9.1-SNAPSHOT"
+libraryDependencies += "com.newbyte" %% "panoptes-scala-play" % "0.9.3-SNAPSHOT"
 ```
 
 ### Declare Filter
@@ -259,4 +259,4 @@ Why would you want to do that? Dunno, but you can!!!
 
 * Permission based rules.
 * More code samples.
-* Opened to hear requests from you.
+* Any requests from you?
