@@ -4,6 +4,7 @@ import com.newbyte.panoptes.model.Subject
 import play.api.mvc.{RequestHeader, Result, Results}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait AuthorizationHandler {
 
@@ -11,8 +12,8 @@ trait AuthorizationHandler {
 
   def authHeaderName = "Authorization"
 
-  def authHeaderNotPresentAction(request: RequestHeader, next: (RequestHeader) => Future[Result]) = {
-    Results.Forbidden
+  def authHeaderNotPresentAction(request: RequestHeader, next: (RequestHeader) => Future[Result]): Future[Result] = {
+    Future(Results.Forbidden)
   }
 
   def userNotAllowedStatus: Result = Results.Forbidden

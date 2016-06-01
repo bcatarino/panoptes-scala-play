@@ -16,7 +16,7 @@ final class SecurityFilter @Inject()(authorizationHandler: AuthorizationHandler)
       case None =>
         authorizationHandler.getClosestMatch(request) match {
           case None => next(request)
-          case _ => Future(authorizationHandler.authHeaderNotPresentAction(request, next))
+          case _ => authorizationHandler.authHeaderNotPresentAction(request, next)
         }
       case Some(sessionId) =>
         authorizationHandler.getUser(sessionId) match {
