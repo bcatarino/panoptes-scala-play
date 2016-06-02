@@ -129,10 +129,41 @@ If you're using dependency injection, such as Guice, you need to write an Abstra
 ```scala
 class ControllerProviderModule extends AbstractModule {
   override def configure(): Unit = {
-    bind(classOf[AuthorizationHandler]).to(classOf[MyAuthorizationHandler])
+    bind(classOf[AuthorizationHandlers]).toProvider(authorizationHandlerProvider)
+  }
+  
+  def authorizationHandlerProvider = new Provider[AuthorizationHandlers] {
+    override def get(): AuthorizationHandlers = new AuthorizationHandlers(new MyAuthorizationHandler)
   }
 }
 ```
+
+#### Authorization Handler Chaining
+
+If your application requires you to have different sets of authorization rules, that can become quite painful.
+
+In one of my clients, the common authorization use case is whether or not a user is logged in (which will have a set of roles and permissions, but that's beside the point).
+
+However, some endpoints are called only from mobile devices and for those endpoints, there's no user/pass login. Instead, the device needs to be registered against a parent entity.
+ 
+Panoptes allows to have both authorization sets with minimal effort:
+
+```scala
+class ControllerProviderModule extends AbstractModule {
+  override def configure(): Unit = {
+    bind(classOf[AuthorizationHandlers]).toProvider(authorizationHandlerProvider)
+  }
+  
+  def authorizationHandlerProvider = new Provider[AuthorizationHandlers] {
+    override def get(): AuthorizationHandlers = new AuthorizationHandlers(new UserAuthorizationHandler, new DeviceAuthorizationHandler)
+  }
+}
+```
+
+As you may have noticed, the code is pretty much the same, but you simply add another object to the arguments of ```AuthorizationHandlers```.
+
+Bear in mind the order is important. If a HttpMethod/Url pair matches in the first handler, the request will be authorised depending whether or not that rule passes. The following handlers won't be called.
+On the other hand, if there is no match on the first Handler, the HttpMethod/Url pair will be checked against the second matcher and so on. 
 
 ### Standard AuthorizationRules
 
@@ -247,7 +278,7 @@ You can override this too:
 class MyAuthorizationHandler extends AuthorizationHandler {
   // (...) Mandatory methods implementation (...)
   
-  def authHeaderNotPresentAction(request: RequestHeader) = Results.InternalServerError
+  def authHeaderNotPresentAction(request: RequestHeader) = Future(Results.InternalServerError)
   
   def userNotAllowedStatus: Result = Results.InternalServerError
 }

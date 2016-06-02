@@ -28,7 +28,7 @@ final class SecurityFilter @Inject()(authorizationHandlers: AuthorizationHandler
         }
       case Some(sessionId) =>
         authorizationHandler.getUser(sessionId) match {
-          case None => Future(authorizationHandler.userNotAllowedStatus)
+          case None => nextHandlerOrFilter(iterator, request, next)
           case userData =>
             if (authorizationHandler.isAllowed(request, userData)) {
               nextHandlerOrFilter(iterator, request, next)

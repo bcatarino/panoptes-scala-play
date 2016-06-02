@@ -1,5 +1,7 @@
 package com.newbyte.panoptes
 
-case class AuthorizationHandlers(handlers: AuthorizationHandler*) {
+import javax.inject.Inject
+
+class AuthorizationHandlers @Inject()(val handlers: AuthorizationHandler*) {
   handlers.foreach(_.config)
 }
