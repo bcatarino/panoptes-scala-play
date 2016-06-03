@@ -18,10 +18,6 @@ trait AuthorizationHandler {
 
   def userNotAllowedStatus: Result = Results.Forbidden
 
-  def isAllowed(request: RequestHeader, user: Option[Subject]): Boolean = {
-    getClosestMatch(request).getOrElse(allow()).applyRule(request, user)
-  }
-
   def getClosestMatch(request: RequestHeader) = {
     val exactMatch = rules.find(ruleTuple => ruleTuple._1.method.getOrElse(request.method).equals(request.method)
       && noEndSlash(ruleTuple._1.pattern).equals(noEndSlash(request.path)))

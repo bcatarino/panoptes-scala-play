@@ -15,43 +15,31 @@ final class SecurityFilter @Inject()(authorizationHandlers: AuthorizationHandler
 
   private def applyHandler(iterator: Iterator[AuthorizationHandler], request: RequestHeader, next: (RequestHeader) => Future[Result]): Future[Result] = {
     val authorizationHandler = iterator.next()
-    request.headers.get(authorizationHandler.authHeaderName) match {
-      case None =>
-        authorizationHandler.getClosestMatch(request) match {
-          case None => nextHandlerOrFilter(iterator, request, next)
-          case _ =>
-            if (iterator.hasNext) {
-              applyHandler(iterator, request, next)
-            } else {
-              nextHandlerOrError(authorizationHandler, iterator, request, next)
-            }
-        }
-      case Some(sessionId) =>
-        authorizationHandler.getUser(sessionId) match {
-          case None => nextHandlerOrFilter(iterator, request, next)
-          case userData =>
-            if (authorizationHandler.isAllowed(request, userData)) {
-              nextHandlerOrFilter(iterator, request, next)
-            } else {
-              Future(authorizationHandler.userNotAllowedStatus)
+
+    authorizationHandler.getClosestMatch(request) match {
+      case None => nextHandlerOrAuthorized(iterator, request, next)
+      case Some(rule) =>
+        request.headers.get(authorizationHandler.authHeaderName) match {
+          case None => authorizationHandler.authHeaderNotPresentAction(request, next)
+          case Some(sessionId) =>
+            authorizationHandler.getUser(sessionId) match {
+              case None => Future(authorizationHandler.userNotAllowedStatus)
+              case userData =>
+                if (rule.applyRule(request, userData)) {
+                  next(request)
+                } else {
+                  Future(authorizationHandler.userNotAllowedStatus)
+                }
             }
         }
     }
   }
 
-  private def nextHandlerOrFilter(iterator: Iterator[AuthorizationHandler], request: RequestHeader, next: (RequestHeader) => Future[Result]) = {
+  private def nextHandlerOrAuthorized(iterator: Iterator[AuthorizationHandler], request: RequestHeader, next: (RequestHeader) => Future[Result]) = {
     if (iterator.hasNext) {
       applyHandler(iterator, request, next)
     } else {
       next(request)
-    }
-  }
-
-  private def nextHandlerOrError(current: AuthorizationHandler, iterator: Iterator[AuthorizationHandler], request: RequestHeader, next: (RequestHeader) => Future[Result]) = {
-    if (iterator.hasNext) {
-      applyHandler(iterator, request, next)
-    } else {
-      current.authHeaderNotPresentAction(request, next)
     }
   }
 }
